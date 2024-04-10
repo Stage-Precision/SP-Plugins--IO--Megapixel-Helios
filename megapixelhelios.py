@@ -10,9 +10,10 @@ class MegapixelModule(sp.BaseModule):
 		"name" : "Megapixel",
 		"description" : "Communicate with Megapixel LED Processor",
 		"author" : "SP",
-		"version" : (1, 0),
+		"version" : (1, 1),
 		"spVersion" : (1, 2, 0),
-		"helpPath" : os.path.join(os.path.dirname(os.path.abspath(__file__)),"help.md")
+		"helpPath" : os.path.join(os.path.dirname(os.path.abspath(__file__)),"help.md"),
+		"iconPath" : os.path.join(os.path.dirname(os.path.abspath(__file__)),"mexapixel.svg")
 	}
 
 	def __init__(self):
@@ -60,49 +61,60 @@ class MegapixelModule(sp.BaseModule):
 				print(f"Error during GET request: {e}")
 				return None
 			
-	def getProcessorInfoAC(self):
+	def getProcessorInfoAC(self, callback):
+		print("read")
 		url = "http://" + self.hostip.value + "/api/v1/public?sys.info="
 		json_result = self.get_request_to_json(url)
+		print(str(json.dumps(json_result)))
 		if json_result:
 			self.pluginData.setTreeValueWithJson("", str(json.dumps(json_result)))
+		print("read  2")
+		callback(False)
 	
-	def getPresetListAC(self):
+	def getPresetListAC(self,callback):
 		url = "http://" + self.hostip.value + "/api/v1/presets/list"
 		json_result = self.get_request_to_json(url)
 		if json_result:
 			self.pluginData.setTreeValueWithJson("Presets", str(json.dumps(json_result)))
+		callback(False)
 	
-	def getProcessorFullInfoAC(self):
+	def getProcessorFullInfoAC(self,callback):
 		url = "http://" + self.hostip.value + "/api/v1/public"
 		json_result = self.get_request_to_json(url)
 		if json_result:
 			self.pluginData.setTreeValueWithJson("", str(json.dumps(json_result)))
+		callback(False)
 	
-	def getProcessorAlertAC(self):
+	def getProcessorAlertAC(self,callback):
 		url = "http://" + self.hostip.value + "api/v1/public?dev.ingest.alerts="
 		json_result = self.get_request_to_json(url)
 		if json_result:
 			self.pluginData.setTreeValueWithJson("", str(json.dumps(json_result)))
+		callback(False)
 
-	def setProcessorNameAC(self, name):
+	def setProcessorNameAC(self,callback, name):
 		url = "http://" + self.hostip.value + "/api/v1/public?sys.description="
 		data = {"sys": {"description": name}}
 		json_result = self.post_request_with_json(url, data)
+		callback(False)
 
-	def setProcessorBlackoutAC(self, state):
+	def setProcessorBlackoutAC(self,callback, state):
 		url = "http://" + self.hostip.value + "/api/v1/public?dev.display.blackout="
 		data = {"dev": {"display": { "blackout": state}}}
 		json_result = self.post_request_with_json(url, data)
+		callback(False)
 
-	def setProcessorFreezeAC(self, state):
+	def setProcessorFreezeAC(self,callback, state):
 		url = "http://" + self.hostip.value + "/api/v1/public?dev.display.freeze="
 		data = {"dev": {"display": { "freeze": state}}}
 		json_result = self.post_request_with_json(url, data)
+		callback(False)
 
-	def setProcessorBrightnesAC(self, brightness, gamma):
+	def setProcessorBrightnesAC(self,callback, brightness, gamma):
 		url = "http://" + self.hostip.value + "/api/v1/public?dev.display="
 		data = {"dev":{ "display":{ "brightness":brightness, "gamma": gamma}}}
 		json_result = self.post_request_with_json(url, data)
+		callback(False)
 
 if __name__ == "__main__":
 	sp.registerPlugin(MegapixelModule)
